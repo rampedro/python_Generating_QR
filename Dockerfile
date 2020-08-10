@@ -12,8 +12,7 @@
 FROM python:3.6-slim
 COPY ./app.py /deploy/
 COPY ./requirements.txt /deploy/
-COPY ./2XGB_Classifier.pkl /deploy/
-COPY ./local_predictor.py /deploy/
+COPY ./decryption.py /deploy/
 WORKDIR /deploy/
 RUN apt-get update && apt-get install -y gcc
 RUN pip3 install -r requirements.txt

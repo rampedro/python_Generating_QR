@@ -6,9 +6,8 @@ from flask import send_file
 from io import StringIO,BytesIO
 
 from flask import Flask, jsonify, request
-from decryption import set_msg
+from decryption import return_encrypted, set_msg
 #import sha3
-#import base64
 
 
 app = Flask(__name__)
@@ -18,7 +17,7 @@ app.secret_key = 'something_secret'
 import qrcode
 
 
-def random_qr(txt):
+def random_qr(txt='sampleText'):
     qr = qrcode.QRCode(version=1,
                        error_correction=qrcode.constants.ERROR_CORRECT_L,
                        box_size=10,
@@ -38,24 +37,22 @@ def return_result():
 @app.route('/get_qrimg',methods=['GET'])
 def get_qrimg():
     mytext = b''
-    user_text = request.args.get('text') 
-    ## Encryptor
-    mytext += set_msg(user_text)
+    user_text = request.args.get('text')
+    mytext += bytearray(user_text, 'utf-8')
     
-    #mytext = user_text
-
-
+    set_msg(mytext)
+    mytext = return_encrypted()
     ## hashing user data
+
     #hash_function = sha3.keccak_256()
     #hash_function.update(mytext)
     #encrypted_text = hash_function.hexdigest()
-    img = random_qr(txt=mytext)
+    
 
     img_buf = BytesIO()
+    img = random_qr(txt=mytext)
     img.save(img_buf)
-    #img_str = base64.b64encode(img_buf.getvalue()).decode()
     img_buf.seek(0)
-    #img_str.seek(0)
     return send_file(img_buf, mimetype='image/png')
 
 
