@@ -13,8 +13,8 @@ _private_key = b''
 
 
 def set_msg(s):
-    ACCESS_KEY = 'XXXXXXXXXXXX'
-    SECRET_KEY = 'XXXXXXXXXXX'    
+    ACCESS_KEY = 'XXXXXXXXXXXXX'
+    SECRET_KEY = 'XXXXXXXXXXXXX'    
 
     mytext = b''
     #if s:
