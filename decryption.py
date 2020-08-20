@@ -2,9 +2,22 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.asymmetric import padding
 from cryptography.hazmat.primitives import serialization
 import base64
+
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives.asymmetric import rsa
+
 #message = b'encrypt me!'
 #s = "sample"
+_private_key = b''
+
+
+
 def set_msg(s):
+    #ACCESS_KEY = 'AKIAJPEFUIKHDBSSZCPQ' 
+    ACCESS_KEY = 'AKIAZJHX3N6W2RWUR7VZ'
+    #SECRET_KEY = 'pPMFjLjqThlNa0E6xfFEsNgPjIU9m6+YYI50GFyj'
+    SECRET_KEY = 'Rn779iWCB8nGxHddE3C+o1P2lKC08ukDrSwT0HYP'    
+
     mytext = b''
     #if s:
     mytext += bytearray(s, 'utf-8')
@@ -22,6 +35,8 @@ def set_msg(s):
         key_size=2048,
         backend=default_backend()
     )
+    #pv = private_key
+    _private_key = private_key
 
     pri = private_key.private_bytes(encoding=serialization.Encoding.PEM,
     format=serialization.PrivateFormat.PKCS8,
@@ -29,20 +44,38 @@ def set_msg(s):
 )
 
     #print("Private key:")
-    #print(str(pri))
+    #print(" THE PRI ")
+    #print(pri)
     
 
     ## Creating a private key file
-    with open('private_key.pem', 'wb') as f:
+    with open('private_key3.pem', 'wb') as f:
         f.write(pri)
+    
+    import boto3
+    from botocore.exceptions import NoCredentialsError
+    s3 = boto3.client('s3', aws_access_key_id=ACCESS_KEY,
+                      aws_secret_access_key=SECRET_KEY)
+    import random
+    n = random.random()
+    name = "check" + str(n)
+    
+    print("********pri**********")
+    print(pri)
+    
 
+    #pri_transfer = base64.b64encode()
+    s3.put_object(Bucket = 'withthem' , Key = name , Body = pri)
+    #s3.upload_file(pri_transfer, 'withthem', name)    
+    
+
+#    print(pri_transfer)
     print("private key is generated and saved")
 
 ## Generating the public key to encrypt the msg 
 
 
     public_key = private_key.public_key()
-
 
 
     pub = public_key.public_bytes(
@@ -67,12 +100,16 @@ def set_msg(s):
 
 #print("Encrypted MSG:")
 #print(encrypted)
+
+
+## This is how we pass the keys. in Base64
+
     print("Encrypted:")
     print(str(encrypted))
     
     _str = base64.b64encode(encrypted)
 
-    print(_str)
+    print(encrypted)
     return _str
 
 
@@ -82,4 +119,5 @@ def return_encrypted():
     return encrypted
 
 def return_private_key():
-    return pri
+    #pvm = base64.b64encode(pv)
+    return _private_key

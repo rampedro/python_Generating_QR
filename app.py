@@ -1,21 +1,45 @@
 import json
 import os
+#import flask
+#from flask 
 from flask import Flask, jsonify,request
+#from flask 
 from flask import send_file
 
 from io import StringIO,BytesIO
 
-from flask import Flask, jsonify, request
-from decryption import set_msg
+from decryption import set_msg,return_private_key
+
 #import sha3
 #import base64
-
+import boto3
+from botocore.exceptions import NoCredentialsError
 
 app = Flask(__name__)
 app.secret_key = 'something_secret'
 
 
 import qrcode
+
+
+
+
+#s3.Object('withthem', 'ax.jpg').put(Body=open('ax.jpg', 'rb'))
+
+def upload_to_aws(local_file, bucket, s3_file):
+
+
+    try:
+        s3.upload_file(local_file, bucket, s3_file)
+        print("Upload Successful")
+        return True
+    except FileNotFoundError:
+        print("The file was not found")
+        return False
+    except NoCredentialsError:
+        print("Credentials not available")
+        return False
+
 
 
 def random_qr(txt):
@@ -29,6 +53,10 @@ def random_qr(txt):
     img = qr.make_image()
     return img
 
+@app.route("/transfer",methods=['GET'])
+def transfer():
+    user_text = request.args.get('text')
+    return jsonify(user_text)
 
 
 @app.route("/",methods=['GET'])
@@ -41,7 +69,6 @@ def get_qrimg():
     user_text = request.args.get('text') 
     ## Encryptor
     mytext += set_msg(user_text)
-    
     #mytext = user_text
 
 
@@ -50,6 +77,23 @@ def get_qrimg():
     #hash_function.update(mytext)
     #encrypted_text = hash_function.hexdigest()
     img = random_qr(txt=mytext)
+    print("KEY!")
+    #print(return_private_key) 
+
+    #pri = return_private_key()
+    ## Send into AWS
+    #with open('myfile2.pem', 'wb') as fd:
+    #    fd.write(pri)
+
+    import random
+    n = random.random()
+    name = str(n) + "file"
+    #uploaded = upload_to_aws('private_key2.pem', 'withthem', name)
+                                        
+
+
+
+
 
     img_buf = BytesIO()
     img.save(img_buf)
@@ -58,6 +102,9 @@ def get_qrimg():
     #img_str.seek(0)
     return send_file(img_buf, mimetype='image/png')
 
+#@app.route("/pvm",methods=['GET'])
+#def pvm():
+#    return pv
 
     
 if __name__ == '__main__':

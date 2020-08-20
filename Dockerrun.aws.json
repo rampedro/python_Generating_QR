@@ -1,7 +1,7 @@
 {
   "AWSEBDockerrunVersion": "1",
   "Image": {
-    "Name": "pedahd/myqrapp:latest",
+    "Name": "pedahd/qrapp:latest",
     "Update": "true"
   },
   "Ports": [
